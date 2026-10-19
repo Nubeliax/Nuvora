@@ -1,0 +1,1 @@
+Initial project foundation (Milestone 0): base Android setup with Jetpack Compose, Material 3, and English/Spanish localization structure. No weather features yet.

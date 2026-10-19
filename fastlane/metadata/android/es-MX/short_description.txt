@@ -1,0 +1,1 @@
+App libre que traduce datos meteorológicos en información sencilla y clara.

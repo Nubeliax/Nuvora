@@ -1,0 +1,1 @@
+Free and open-source app that translates weather data into simple information.

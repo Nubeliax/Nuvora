@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Nuvora</string>
+    <string name="home_placeholder_title">Nuvora</string>
+    <string name="home_placeholder_body">Initial project foundation ready. Weather features will be added in upcoming milestones.</string>
+</resources>

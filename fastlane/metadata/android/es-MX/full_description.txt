@@ -1,0 +1,7 @@
+Nuvora es una aplicación Android de software libre (GPL-3.0-or-later) cuyo objetivo es traducir datos meteorológicos en información sencilla, honesta y fácil de comprender.
+
+Metadatos provisionales (Hito 0):
+- El proyecto se encuentra en su etapa de base inicial (versión 0.0.1).
+- Actualmente incluye la interfaz inicial en Jetpack Compose + Material 3 y la estructura base de traducción en inglés y español.
+- La integración con Open-Meteo, las reglas meteorológicas y la gestión de ubicaciones se implementarán en los próximos hitos y aún no están presentes en esta versión.
+- Respetuosa con tu privacidad: sin anuncios, sin rastreadores, sin analítica y sin permisos en esta versión inicial.

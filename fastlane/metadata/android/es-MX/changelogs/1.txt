@@ -1,0 +1,1 @@
+Base inicial del proyecto (Hito 0): configuración Android con Jetpack Compose, Material 3 y estructura base en inglés y español. Aún sin funciones meteorológicas.
