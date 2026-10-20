@@ -9,22 +9,129 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Validate Gradle wrapper
-        uses: gradle/actions/wrapper-validation@v4
+        uses: gradle/actions/wrapper-validation@v6
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
 
+      # Use open-source basic cache provider (default enhanced cache in v6 is proprietary)
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
 
       - name: Run unit tests, Lint, and assemble debug APK
         run: ./gradlew testDebugUnitTest lintDebug assembleDebug
+
+      - name: Display test and Lint summary
+        if: always()
+        run: |
+          echo "=== Unit Test Results Summary ==="
+          if [ -d "app/build/test-results/testDebugUnitTest" ]; then
+            found_tests=0
+            for xml in app/build/test-results/testDebugUnitTest/*.xml; do
+              if [ -f "$xml" ]; then
+                found_tests=1
+                suite=$(basename "$xml")
+                counts=$(grep -m 1 '<testsuite' "$xml" | grep -oE '(tests|skipped|failures|errors)="[0-9]+"' | tr '\n' ' ' || true)
+                echo "$suite: $counts"
+              fi
+            done
+            if [ "$found_tests" -eq 0 ]; then
+              echo "No test XML files found in app/build/test-results/testDebugUnitTest."
+            fi
+          else
+            echo "Directory app/build/test-results/testDebugUnitTest not found."
+          fi
+
+          echo ""
+          echo "=== Lint Summary ==="
+          lint_file=$(find app/build/reports -type f -name "lint-results*.xml" 2>/dev/null | head -n 1 || true)
+          if [ -n "$lint_file" ] && [ -f "$lint_file" ]; then
+            echo "Lint XML report: $lint_file"
+            severities=$(grep -oE 'severity="[A-Za-z]+"' "$lint_file" | sed -E 's/severity="([A-Za-z]+)"/\1/' | sort | uniq -c || true)
+            if [ -n "$severities" ]; then
+              echo "Issue counts by severity:"
+              echo "$severities"
+            else
+              echo "0 issues found (clean report)."
+            fi
+          else
+            echo "No lint XML report found in app/build/reports."
+          fi
+
+      - name: Display merged debug manifest permissions
+        if: always()
+        run: |
+          echo "=== Merged Debug Manifest Permissions ==="
+          manifest_files=$(find app/build/intermediates -type f -path "*merged*debug*AndroidManifest.xml" 2>/dev/null || true)
+          if [ -z "$manifest_files" ]; then
+            manifest_files=$(find app/build/intermediates -type f -path "*debug*AndroidManifest.xml" 2>/dev/null || true)
+          fi
+
+          if [ -n "$manifest_files" ]; then
+            for manifest in $manifest_files; do
+              echo "Manifest: $manifest"
+              echo ""
+              echo "--- Declared Permissions (<uses-permission> / <permission>) ---"
+              awk '
+                BEGIN { in_tag = 0; buffer = ""; count = 0 }
+                /<(uses-permission(-sdk-23)?|permission)([[:space:]>]|$)/ {
+                  in_tag = 1
+                  buffer = $0
+                  if ($0 ~ />/) {
+                    print buffer
+                    count++
+                    in_tag = 0
+                    buffer = ""
+                  }
+                  next
+                }
+                in_tag {
+                  buffer = buffer "\n" $0
+                  if ($0 ~ />/) {
+                    print buffer
+                    count++
+                    in_tag = 0
+                    buffer = ""
+                  }
+                }
+                END {
+                  if (count == 0) {
+                    print "No declared permissions (<uses-permission> or <permission>) found."
+                  }
+                }
+              ' "$manifest"
+
+              echo ""
+              echo "--- Component Protections (android:permission attributes) ---"
+              comp_perms=$(grep -n -E 'android:permission="[^"]+"' "$manifest" || true)
+              if [ -n "$comp_perms" ]; then
+                echo "$comp_perms"
+              else
+                echo "No component protections (android:permission attributes) found."
+              fi
+            done
+          else
+            echo "WARNING: Merged AndroidManifest.xml not found under app/build/intermediates/"
+          fi
+
+      - name: Upload reports and test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: reports-and-test-results
+          path: |
+            app/build/reports/
+            app/build/test-results/
+          retention-days: 7
+          if-no-files-found: warn

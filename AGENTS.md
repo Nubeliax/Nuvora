@@ -21,6 +21,7 @@
 - Ubicación solo con `LocationManager` de la plataforma Android, nunca Fused Location ni Google Play Services; sin ubicación en segundo plano; la selección manual de ciudad debe funcionar sin permisos de ubicación.
 - Antes de integrar cualquier API o biblioteca, verificar que su licencia sea compatible con `GPL-3.0-or-later`, así como sus condiciones de uso, atribución y límites.
 - `android:usesCleartextTraffic="false"` explícito en el manifiesto.
+- En CI solo se usan acciones oficiales (`actions/*`, `gradle/*`) con licencia libre; `gradle/actions/setup-gradle` debe usar `cache-provider: basic` mientras el caching por defecto sea propietario.
 - Nunca subir `local.properties`, keystores, credenciales ni secretos al repositorio.
 
 ## 4. Reglas de internacionalización (i18n)

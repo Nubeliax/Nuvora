@@ -4,8 +4,8 @@ This document tracks the planned milestones for Nuvora. Work progresses sequenti
 
 | Milestone | Description | Status |
 | :--- | :--- | :--- |
-| **Milestone 0** | Preparation. Project structure, Gradle and wrapper, license, `AGENTS.md`, documentation, i18n base, base Fastlane metadata, initial screen, test setup with a trivial passing test, and CI workflow. | **In progress** |
-| **Milestone 1** | Compilable and reproducible skeleton. `./gradlew testDebugUnitTest lintDebug assembleDebug` passes in CI from a clean clone; configuration problems are fixed before adding features. | Pending |
+| **Milestone 0** | Preparation. Project structure, Gradle and wrapper, license, `AGENTS.md`, documentation, i18n base, base Fastlane metadata, initial screen, test setup with a trivial passing test, and CI workflow. | **Done** |
+| **Milestone 1** | Compilable and reproducible skeleton. The clean clone CI criterion was met in commit `b5af3b2`; the remainder of the milestone consists of hardening the CI and reporting verifiable evidence. Configuration problems are fixed before adding features. | **In progress** |
 | **Milestone 2** | Open-Meteo model and API. Isolated integration with error and missing-data handling; JSON fixtures and `MockWebServer` tests before it is considered done. | Pending |
 | **Milestone 3** | Main screen. Current conditions and natural-language explanations; rules with unit tests first. | Pending |
 | **Milestone 4** | Daily forecast. Upcoming days and rules for communicating them; rules with unit tests first. | Pending |
